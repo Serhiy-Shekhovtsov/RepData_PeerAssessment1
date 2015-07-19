@@ -124,3 +124,20 @@ print(paste("median ", median(total_steps_per_day$steps)))
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```r
+library(lattice)
+
+# replace date with 
+weekends = grepl("Sat|Sun", weekdays(data_without_NA$date))
+data_without_NA$daytype[weekends] = "weekend"
+data_without_NA$daytype[!weekends] = "weekday"
+
+total_steps_per_day = aggregate(steps~interval+daytype, data=data_without_NA, sum)
+total_steps_per_day$daytype = as.factor(total_steps_per_day$daytype)
+
+xyplot(steps~interval|daytype, data=total_steps_per_day, main="Title",
+			 layout=c(1,2), type = "l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 

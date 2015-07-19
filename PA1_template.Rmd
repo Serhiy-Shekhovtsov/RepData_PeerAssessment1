@@ -7,7 +7,7 @@ output:
 
 
 ## Loading and preprocessing the data
-``` {r}
+``` {r echo = TRUE}
 # load file as RDS and extract if not extracted yet
 rds_src_file <- "Data\\Src\\activity.rds"
 if (file.exists(rds_src_file)) {
@@ -34,7 +34,7 @@ data$date <- as.Date(data$date, "%Y-%m-%d")
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+```{r echo = TRUE}
 
 # aggregate steps by days
 total_steps_per_day = aggregate(steps~date, data=data, sum)
@@ -50,7 +50,7 @@ print(paste("median ", median(total_steps_per_day$steps)))
 
 ## What is the average daily activity pattern?
 
-```{r}
+```{r echo = TRUE}
 
 # calculate average steps taken per interval
 avg_steps_per_interval = aggregate(steps~interval, data=data, mean)
@@ -69,7 +69,7 @@ print(avg_steps_per_interval[avg_steps_per_interval$steps == max_steps,1])
 
 ## Imputing missing values
 
-```{r}
+```{r echo = TRUE}
 
 # so we have average steps taken per interval (avg_steps_per_interval$steps)
 # let's repeat it by number of days to get one long verctor of mean per each
@@ -94,3 +94,18 @@ print(paste("median ", median(total_steps_per_day$steps)))
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r echo = TRUE}
+library(lattice)
+
+# replace date with 
+weekends = grepl("Sat|Sun", weekdays(data_without_NA$date))
+data_without_NA$daytype[weekends] = "weekend"
+data_without_NA$daytype[!weekends] = "weekday"
+
+total_steps_per_day = aggregate(steps~interval+daytype, data=data_without_NA, sum)
+total_steps_per_day$daytype = as.factor(total_steps_per_day$daytype)
+
+xyplot(steps~interval|daytype, data=total_steps_per_day, main="Title",
+			 layout=c(1,2), type = "l")
+
+```
